@@ -1,0 +1,32 @@
+{
+  "name": "reactapplication",
+  "version": "1.0.0",
+  "description": "Mastering react",
+  "main": "App.js",
+  "scripts": {
+    "start": "parcel index.html",
+    "build": "parcel build index.html",
+    "test": "jest"
+  },
+  "rpepository": {
+    "type": "git",
+    "url": "git+https://github.com/Alok277/ReactIndeed.git"
+  },
+  "keywords": [
+    "Alok"
+  ],
+  "author": "Alok",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Alok277/ReactIndeed/issues"
+  },
+  "homepage": "https://github.com/Alok277/ReactIndeed#readme",
+  "devDependencies": {
+    "parcel": "^2.9.3"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.16.0"
+  }
+}

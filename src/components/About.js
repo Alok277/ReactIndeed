@@ -1,0 +1,12 @@
+import React from 'react'
+
+const About = () => {
+  return (
+    <div>
+    <div>About</div>
+    <h2>Mastering React Js</h2>
+    </div>
+  )
+}
+
+export default About
