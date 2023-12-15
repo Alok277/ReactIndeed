@@ -1,31 +1,35 @@
-import React, { useEffect, useState } from "react";
-import RestaurantList from "./RestaurantList";
+import React, { useContext, useEffect, useState } from "react";
+import RestaurantList, { withPromotedRestaurant } from "./RestaurantList";
 import Shimmer from "./Shimmer";
+import { Link } from "react-router-dom";
+import { RESTAURANT_LIST } from "../utils/constants";
+import useOnlineStatus from "../utils/useOnlineStatus";
+import UserContext from "../utils/UserContext";
+
 
 const Body = () => {
   const [restaurantList, setRestaurantList] = useState([]);
   const [filteredRestaurant, setFilteredRestaurant] = useState([]);
   const [searchRestaurant, setSearchRestaurant] = useState("");
   const restaurantHandler = () => {
-    const filteredRestaurants = restaurantList.filter(
-      (res) => res.info.avgRating > 4.0
+    console.log(restaurantList)
+    const filteredRestaurantList = restaurantList.filter(
+      (res) => res.info.avgRating >= 4.1
     );
-    setRestaurantList(filteredRestaurants);
+    console.log(filteredRestaurantList.length);
+    console.log(filteredRestaurantList)
+    setFilteredRestaurant(filteredRestaurantList);
   };
 
+  const { userLogin , setUserName } = useContext(UserContext);
+  const PromotedRestaurant = withPromotedRestaurant(RestaurantList);
   useEffect(() => {
     fetchData();
   }, []);
   const fetchData = async () => {
-    const data = await fetch(
-      "https://www.swiggy.com/dapi/restaurants/list/v5?lat=28.6332031&lng=77.4315663&is-seo-homepage-enabled=true&page_type=DESKTOP_WEB_LISTING"
-    );
+    const data = await fetch(RESTAURANT_LIST);
     const responseData = await data.json();
-    console.log(
-      responseData.data.cards[5].card.card.gridElements.infoWithStyle
-        .restaurants
-    );
-    //Optional chaining
+   
     setRestaurantList(
       responseData?.data?.cards[5]?.card?.card?.gridElements?.infoWithStyle
         ?.restaurants
@@ -36,16 +40,22 @@ const Body = () => {
     );
   };
 
+  const onlineStatus = useOnlineStatus();
+
+  if (onlineStatus === false)
+    return <h1>You are offine, Please check your internet</h1>;
+
   return restaurantList.length === 0 ? (
     <Shimmer />
   ) : (
     <div className="body">
-      <div className="search">
-        <div className="filter-restaurant">
+      <div className="search flex m-6 ">
+        <div className="filter-restaurant flex gap-4 ">
           <input
             type="text"
+            data-testid="searchInput"
             value={searchRestaurant}
-            className="input-restaurant"
+            className="border border-solid border-black"
             onChange={(e) => setSearchRestaurant(e.target.value)}
           />
           <button
@@ -57,18 +67,35 @@ const Body = () => {
               );
               setFilteredRestaurant(searchResult);
             }}
+            className="px-4 bg-gray-200 rounded-xl"
           >
             Search
           </button>
         </div>
-        <button className="filter-btn" onClick={restaurantHandler}>
-          Top Rated Restaurants
-        </button>
+        <div className="ml-6 px-4 bg-gray-200 rounded-lg">
+          <button className="filter-btn" onClick={restaurantHandler}>
+            Top Rated Restaurants
+          </button>
+        </div>
+        <div className="filter-restaurant flex gap-4 ">
+          <label>UserName:</label>
+          <input
+            className="border border-solid border-black"
+            value={userLogin}          
+            onChange={(e) => setUserName(e.target.value)}
+          />
+        </div>
       </div>
-      <div className="res-container">
-        {console.log(restaurantList)}
+      <div className="flex flex-wrap justify-start">
+       
         {filteredRestaurant.map((restaurant) => (
-          <RestaurantList resName={restaurant} />
+          <Link to={"/restaurants/" + restaurant.info.id}>
+            {restaurant.info.aggregatedDiscountInfoV3 ? (
+              <PromotedRestaurant resName={restaurant} />
+            ) : (
+              <RestaurantList resName={restaurant} />
+            )}
+          </Link>
         ))}
       </div>
     </div>
